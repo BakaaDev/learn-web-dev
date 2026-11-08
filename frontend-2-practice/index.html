@@ -1,14 +1,97 @@
 <!DOCTYPE html>
 <html lang="ru">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Выбор даты и времени</title>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <div class="page">
-      <!-- Перенесите вашу верстку. Удалите статичные данные. Подключите скрипт -->
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Выбор даты и времени — ФОРМА</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="page">
+  <header class="top">
+    <div class="wrap top-row">
+      <strong class="logo">ФОРМА</strong>
+      <nav class="menu" aria-label="Меню">
+        <a class="menu-link" href="#">Услуги</a>
+        <a class="menu-link" href="#">Галерея</a>
+        <a class="menu-link" href="#">Команда</a>
+        <a class="menu-link" href="#">Отзывы</a>
+        <a class="menu-link" href="#contacts">Контакты</a>
+      </nav>
     </div>
-  </body>
+  </header>
+
+  <div class="steps">
+    <ol class="wrap step-list" aria-label="Шаги записи">
+      <li class="step done"><span class="number">1</span><span class="line"></span></li>
+      <li class="step done"><span class="number">2</span><span class="line"></span></li>
+      <li class="step current" aria-current="step"><span class="number">3</span><span class="line"></span></li>
+      <li class="step"><span class="number">4</span><span class="line"></span></li>
+      <li class="step"><span class="number">5</span><span class="line"></span></li>
+    </ol>
+  </div>
+
+  <main class="wrap booking">
+    <div class="heading">
+      <p class="label">Шаг 3 из 5</p>
+      <h1 class="title">Выберите дату и время</h1>
+    </div>
+
+    <div class="columns">
+      <section class="card calendar" aria-labelledby="month">
+        <div class="month-row">
+          <h2 class="card-title" id="month"></h2>
+          <div class="arrows">
+            <button class="arrow" id="previous-month" type="button" aria-label="Предыдущий месяц">‹</button>
+            <button class="arrow" id="next-month" type="button" aria-label="Следующий месяц">›</button>
+          </div>
+        </div>
+
+        <div class="days"></div>
+      </section>
+
+      <section class="card slots" aria-labelledby="available">
+        <h2 class="card-title" id="available">Доступное время</h2>
+        <div class="times"></div>
+      </section>
+    </div>
+
+    <div class="booking-end">
+      <section class="summary" aria-labelledby="chosen">
+        <h2 class="label" id="chosen">Выбрано</h2>
+        <p class="summary-text">Марина · Комплекс стрижка + борода · 60 мин · 2200 ₽</p>
+        <p class="summary-text" id="booking-date" aria-live="polite"></p>
+      </section>
+      <div class="actions">
+        <button class="action" type="button">Назад</button>
+        <button class="action selected" type="button">Далее</button>
+      </div>
+    </div>
+  </main>
+
+  <footer class="bottom">
+    <div class="wrap">
+      <div class="bottom-columns">
+        <div class="bottom-brand">
+          <strong class="logo">ФОРМА</strong>
+          <p class="brand-text">Стрижки, цвет и уход с характером.</p>
+        </div>
+        <section class="bottom-col" id="contacts">
+          <h2 class="label">Контакты</h2>
+          <p class="contact-text"><span class="contact-icon location-icon" aria-hidden="true"></span>ул. Садовая, 15, Москва</p>
+          <p class="contact-text"><span class="contact-icon" aria-hidden="true">☎</span><a class="phone" href="tel:+74951234567">+7 (495) 123-45-67</a></p>
+        </section>
+        <section class="bottom-col">
+          <h2 class="label">Режим работы</h2>
+          <p class="hours">Пн–Пт: 9:00 – 21:00</p>
+          <p class="hours">Сб–Вс: 10:00 – 19:00</p>
+        </section>
+      </div>
+      <div class="bottom-note">
+        <small class="copyright">© 2026. Все права защищены.</small>
+        <a class="legal" href="#">Политика конфиденциальности</a>
+      </div>
+    </div>
+  </footer>
+  <script src="script.js"></script>
+</body>
 </html>
