@@ -1,57 +1,117 @@
-// App — корневой компонент приложения.
-//
-// ЗАДАНИЕ
-// --------
-// Перенесите свою страницу выбора даты и времени из нативного JS
-// на React. У вас уже есть:
-//   - готовая вёрстка (HTML);
-//   - готовые стили (CSS);
-//   - рабочий код на нативном JS (валидация дат, рендер календаря,
-//     обработчики кликов, выбор слота).
-//
-// Теперь нужно то же самое сделать в React.
-//
-// ЧТО НУЖНО СДЕЛАТЬ
-// ------------------
-// 1. Разбить страницу на компоненты. Как именно — решайте сами.
-//    Обычно выделяют: шапку, подвал, календарь, сетку слотов,
-//    нижнюю панель.
-//
-// 2. Перенести вёрстку из HTML в JSX. Стили оставить как есть,
-//    просто положить их в тот же проект (например, в src/styles/
-//    или рядом с компонентами).
-//
-// 3. Заменить нативное состояние (переменные + прямые манипуляции
-//    с DOM) на useState. Какие именно данные должны жить в состоянии —
-//    подумайте сами. Скорее всего: текущий месяц, выбранный день,
-//    выбранное время, массив слотов.
-//
-// 4. Рендер календаря и слотов делать через JSX и .map(),
-//    без innerHTML и querySelector.
-//
-// 5. Обработчики кликов — через onClick прямо в JSX,
-//    без addEventListener.
-//
-// 6. Функции для работы с датами, которые вы уже написали
-//    на нативном JS (построение сетки календаря, сравнение дат,
-//    проверка «не раньше сегодня»), можно переиспользовать.
-//    Они чистые — не зависят от React. Создайте файл
-//    src/utils/date.js и перенесите их туда.
-//
-//
-// ПОДСКАЗКА
-// ---------
-// Если что-то не работает или непонятно, как перевести нативный
-// код на React — вернитесь к лекции. Там разбирались все
-// основные приёмы: состояние, пропсы, рендер списков, колбэки.
-//
-// Ниже — пустой каркас. Здесь можно начать писать.
+import { useEffect, useState } from "react";
+import Header from "./components/Header.jsx";
+import Footer from "./components/Footer.jsx";
+import StepIndicator from "./components/StepIndicator.jsx";
+import Calendar from "./components/Calendar.jsx";
+import TimeSlots from "./components/TimeSlots.jsx";
+import BookingSummary from "./components/BookingSummary.jsx";
+import { compareDates } from "./utils/date.js";
+import { fetchToday } from "./api.js";
 
 function App() {
+  const [today, setToday] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [currentMonth, setCurrentMonth] = useState(null);
+  const [selectedDay, setSelectedDay] = useState(null);
+  const [selectedTime, setSelectedTime] = useState(null);
+
+  // При открытии страницы получаем «сегодня» с сервера.
+  useEffect(() => {
+    let active = true;
+
+    async function loadToday() {
+      try {
+        const data = await fetchToday();
+        if (!active) return;
+        setToday(data);
+        setCurrentMonth({ year: data.year, month: data.month });
+        setSelectedDay(data.day);
+      } catch (err) {
+        if (active) setError(err.message);
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+
+    loadToday();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  function handleDayClick(day) {
+    setSelectedDay(day);
+    setSelectedTime(null);
+  }
+
+  function handleMonthChange(offset) {
+    const date = new Date(currentMonth.year, currentMonth.month + offset, 1);
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const lastDay = new Date(year, month + 1, 0).getDate();
+
+    setCurrentMonth({ year: year, month: month });
+    setSelectedTime(null);
+
+    if (compareDates({ year: year, month: month, day: lastDay }, today) < 0) {
+      setSelectedDay(null);
+    } else {
+      const isCurrentMonth = year === today.year && month === today.month;
+      setSelectedDay(isCurrentMonth ? today.day : 1);
+    }
+  }
+
   return (
-    <div>
-      {/* Начните отсюда. Например, разметьте .page, добавьте шапку,
-            основную область, подвал. */}
+    <div className="page">
+      <Header />
+      <StepIndicator />
+
+      <main className="wrap booking">
+        <div className="heading">
+          <p className="label">Шаг 3 из 5</p>
+          <h1 className="title">Выберите дату и время</h1>
+        </div>
+
+        {loading ? (
+          <p className="status-message" role="status">Загрузка календаря…</p>
+        ) : error ? (
+          <p className="status-message error" role="alert">
+            Не удалось загрузить календарь: {error}
+          </p>
+        ) : (
+          <>
+            <div className="columns">
+              <Calendar
+                year={currentMonth.year}
+                month={currentMonth.month}
+                today={today}
+                selectedDay={selectedDay}
+                onDayClick={handleDayClick}
+                onMonthChange={handleMonthChange}
+              />
+              {/* Новая дата — новый компонент со своей загрузкой слотов. */}
+              <TimeSlots
+                key={`${currentMonth.year}-${currentMonth.month}-${selectedDay}`}
+                year={currentMonth.year}
+                month={currentMonth.month}
+                selectedDay={selectedDay}
+                selectedTime={selectedTime}
+                onTimeClick={setSelectedTime}
+              />
+            </div>
+
+            <BookingSummary
+              year={currentMonth.year}
+              month={currentMonth.month}
+              selectedDay={selectedDay}
+              selectedTime={selectedTime}
+            />
+          </>
+        )}
+      </main>
+
+      <Footer />
     </div>
   );
 }

@@ -15,7 +15,7 @@ async function request(url) {
     try {
       const data = await response.json();
       if (data && data.error) message = data.error;
-    } catch (e) {
+    } catch {
       // Тело не JSON — оставляем базовый текст.
     }
     throw new Error(message);
